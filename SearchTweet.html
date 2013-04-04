@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<body style="background-color:#E0ECF8;">
+<h3 style="
+color:#000090;
+position:absolute;
+left: 52%;
+">Search last 5 tweets on Twitter</h3>
+<img src="http://i.imgur.com/tKltDLt.png" height="100" width="300" style="position:absolute; left: 25%"/>
+
+</div>
+<div id="button_text" 	style="
+position:absolute;
+left: 52%;
+top: 10%;
+"
+>
+<input type="text" align="center" id="search_keyword" style="background-color:#F8FBEF;" />
+<button align="center"onclick="getSearchKeyWord()" style="background-color:#F8FBEF;">Search!</button><br />
+</div>
+<div id="tweet_list" style="
+background-color:#F5FBEF;
+color: #000033;
+width:650px;
+height:450px;
+position:absolute;
+left: 25%;
+top: 18%;
+">
+
+</div>
+<div id="list" >
+    <script>document.getElementById("tweet_list").innerHTML = '<i>'+"no tweets"+'</i>';</script>
+</div>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+<script>
+var keyWord;
+var time;
+var i = false;
+
+function getSearchKeyWord(){
+	i = true;
+	clearInterval(time);
+	keyWord = document.getElementById("search_keyword").value;
+	searchTweets(keyWord);
+}
+function searchTweets(keyWord){
+	
+$("#tweet_list").empty();
+var existCounter = 0;
+$.ajax({
+	type:'GET',
+	url:"http://search.twitter.com/search.json?callback=?&q="+keyWord+"&rpp=5",
+	dataType: 'json',
+	success: function prcess(tweet){
+		var tweetList = [];
+		var len = $(tweet.results).length;
+		for(var i = 0  ; i < len ; i++){
+			var resultTweet= '<table border-collapse:collapse;><tr><td><img src="'
+			+$(tweet.results)[i].profile_image_url+'" widt="48" height="48" /></td><td >'
+			+'<b>'+$(tweet.results)[i].from_user_name+'</b>'+" @<i>"
+			+$(tweet.results)[i].from_user+"</i> ("+$(tweet.results)[i].created_at+") "
+			+'<br/>'+$(tweet.results)[i].text+'</td></br></tr></table>';
+			tweetList.push(resultTweet);
+			existCounter++;
+		}
+		
+		if(existCounter != 0){
+			var len2 = tweetList.length;
+			for(var j = 0 ; j < len2 ; j++){
+				$("#tweet_list").append(tweetList[j]);
+			}
+		}else
+			noTweet();
+	}	
+});
+
+	if(i == true){
+		time = setInterval(refreshDiv, 10000);
+		i = false;
+	}
+}
+function refreshDiv() {
+    searchTweets(keyWord);
+}
+
+function noTweet(){
+	document.getElementById("tweet_list").innerHTML = '<i>'+"no tweets"+'</i>';
+}
+
+
+</script>
+
+</body>
+</html>
